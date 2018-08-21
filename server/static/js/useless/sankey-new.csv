@@ -1,0 +1,11 @@
+source,target,value
+L3,M1,2
+L3,M0,3
+L2,M1,1
+L1,M0,4
+L1,M-1,3
+M1,R2,2
+M1,R1,1
+M0,R3,3
+M0,R1,4
+M-1,R2,1

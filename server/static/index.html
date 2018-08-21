@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visual Comparison of Commercial Entities</title>
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!--<nav id="body-navbar" class="navbar navbar-inverse navbar-static-top">-->
+<!--&lt;!&ndash; container to make the display of navbar to be centered &ndash;&gt;-->
+<!--<div class="container">-->
+<!--<div class="navbar-header">-->
+<!--<a class="navbar-brand hidden-sm" href="#"> Visual Comparison of Commercial Entities</a>-->
+<!--</div>-->
+
+<!--<div class="navbar-collapse collapse navbar-right">-->
+<!--<ul class="nav navbar-nav">-->
+<!--<li v-for="item in buttons">-->
+<!--</li>-->
+<!--</ul>-->
+<!--</div>-->
+<!--</div>-->
+<!--</nav>-->
+
+<div class="container-fluid" style="margin-top: 10px">
+    <div class="row">
+        <div id="control-view" class="sidebar main-column" style="margin-left: 20px;float: left; width: 17.5%;">
+            <section style="margin-top: 1px">
+                <h3 style="margin-top: 0px;" class="singleViewHeader">Control Panel</h3>
+                <div id="control_pannel">
+                    <div class="control_pannel_sub_section">
+                        <div class="control_pannel_row">
+                            <span style="display: inline-block; width: 12%;"
+                                  class="control_pannel_attr_name">City:</span>
+                            <select v-model="selected_city" style="display: inline; width: 30%;"
+                                    v-on:change="onCityOrTypeChanged">
+                                <option v-for="city in cities" v-bind:value="city">
+                                    {{ city }}
+                                </option>
+                            </select>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <span style="display: inline-block; width: 12%;"
+                                  class="control_pannel_attr_name">Type:</span>
+                            <select v-model="selected_type" style="display: inline; width: 30%;"
+                                    v-on:change="onCityOrTypeChanged">
+                                <option v-for="type in types" v-bind:value="type">
+                                    {{ type }}
+                                </option>
+                            </select>
+                        </div>
+                        <!--<div class="control_pannel_row">-->
+                        <!--<span style="display: inline-block; width: 12%;"-->
+                        <!--class="control_pannel_attr_name">Type:</span>-->
+                        <!--<select v-model="selected_type" style="display: inline; width: 30%;"-->
+                        <!--v-on:change="onCityOrTypeChanged">-->
+                        <!--<option v-for="type in types" v-bind:value="type">-->
+                        <!--{{ type }}-->
+                        <!--</option>-->
+                        <!--</select>-->
+                        <!--</div>-->
+                    </div>
+
+                    <div class="control_pannel_sub_section">
+                        <div class="control_pannel_row">
+                            <span style="display: inline-block; width: 40%;" class="control_pannel_attr_name">Area Selection: </span>
+                            <input type="checkbox" v-model="area_selection" v-on:change="onAreaSelectionChange"
+                                   style="width: 30%">
+                        </div>
+
+
+                        <div>
+                            <div style="display:inline-block; width: 42%;">
+                                <span style="display: inline;" class="control_pannel_attr_name">Price Level: <= </span>
+                                <span style="display: inline;">{{ price_slider.cur_max }}</span>
+                            </div>
+                            <input type="range" v-model="price_slider.cur_max" v-bind:min="price_slider.min"
+                                   v-bind:max="price_slider.max" style="display: inline-block; width: 45%;">
+                        </div>
+                        <div>
+                            <div style="display: inline-block; width: 42%;">
+                                <span style="display: inline;" class="control_pannel_attr_name">Customer:   >= </span>
+                                <span style="display: inline; width: 25%;">{{ customer_slider.cur_min }}</span>
+                            </div>
+                            <input type="range" v-model="customer_slider.cur_min" v-bind:min="customer_slider.min"
+                                   v-bind:max="customer_slider.max" style="display: inline; width: 45%;">
+                        </div>
+                        <div>
+                            <div style="display: inline-block; width: 42%;">
+                                <span class="control_pannel_attr_name">Rating:     >= </span>
+                                <span>{{ rating_slider.cur_min }}</span>
+                            </div>
+                            <input type="range" v-model="rating_slider.cur_min" v-bind:min="rating_slider.min"
+                                   v-bind:max="rating_slider.max" style="display: inline; width: 45%;">
+                        </div>
+                        <div>
+                            <div style="display: inline-block; width: 42%;">
+                                <span class="control_pannel_attr_name">Link:     >= </span>
+                                <span>{{ link_slider.cur_min }}</span>
+                            </div>
+                            <input type="range" v-model="link_slider.cur_min" v-bind:min="link_slider.min"
+                                   v-bind:max="link_slider.max" style="display: inline; width: 45%;">
+                        </div>
+
+                        <!--<div>-->
+                        <!--<button v-on:click="onConfirmSliderFiltering">Confirm Filtering</button>-->
+                        <!--</div>-->
+
+                        <div class="control_pannel_row">
+                            <span style="display: inline; width: 10%;"
+                                  class="control_pannel_attr_name">Selection: </span>
+                            <button v-on:click="onSubmitSelectionArea" class="btn btn-default">Submit</button>
+                            <button v-on:click="onClearSelectionArea" class="btn btn-default">Clear</button>
+                            <button v-on:click="onConfirmSliderFiltering" class="btn btn-default">Confirm</button>
+                        </div>
+                    </div>
+
+
+                    <div class="control_pannel_row">
+                        <span style="display: inline-block; width: 24%;"
+                              class="control_pannel_attr_name">Time Unit:</span>
+                        <select v-model="selected_time_unit" style="display: inline; width: 26%;"
+                                v-on:change="" class="control_pannel_row">
+                            <option v-for="time_unit in time_unit_options" v-bind:value="time_unit">
+                                {{ time_unit }}
+                            </option>
+                        </select>
+                        &nbsp;
+                        <span style="display: inline-block; width: 17%;"
+                              class="control_pannel_attr_name">Layout:</span>
+                        <select v-model="selected_temporal_layout" style="display: inline; width: 26%;"
+                                v-on:change="onLayoutChanged" class="control_pannel_row">
+                            <option v-for="layout in layout_options" v-bind:value="layout">
+                                {{ layout }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="control_pannel_row">
+                        <span style="display: inline-block; width: 24%;"
+                              class="control_pannel_attr_name">Feature:</span>
+                        <select v-model="selected_text_feature" style="display: inline; width: 26%;"
+                                v-on:change="onSelectedTextFeatureChanged" class="control_pannel_row">
+                            <option v-for="text_feature in text_feature_options" v-bind:value="text_feature">
+                                {{ text_feature }}
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+            </section>
+            <section>
+                <h3 style="margin-top: 0px;" class="singleViewHeader">Business Table</h3>
+                <div style="float:left">
+                    <input v-model="search_words" class="form-control" placeholder="pizza" type="text"
+                           style="width: 50%; display: inline">
+                    <button type="button" class="btn btn-primary" style="display: inline"
+                            v-on:click="startSearchEntities">Search
+                    </button>
+                    <button type="button" class="btn btn-default" style="display: inline" v-on:click="resetSearch">
+                        Reset
+                    </button>
+                </div>
+                <div class="info-header">
+                    <h5 style="text-align: left; font-size: 16px; padding-top: 13px;">Business Table</h5>
+                </div>
+                <div v-if="cur_table_venues.length > 0 && pagination_arr.length > 0">
+                    <table class="table-bordered table-hover" style="cursor: pointer; border: #929292;">
+                        <thead>
+                        <th class="table-cell-mid-align" v-for="attr in cur_table_attr">{{attr}}
+                        </th>
+                        </thead>
+
+                        <tbody>
+                        <!--旧版本-->
+                        <tr class="table-cell-mid-align" v-for="venue in cur_table_venues" :class="{selected_table_row: venue.selection_flag}">
+
+
+                        <!--新版本-->
+                        <!--<tr class="table-cell-mid-align" v-for="venue in cur_table_venues"-->
+                            <!--v-bind:id="venue.css3_business_id">-->
+
+                            <td style="width: 43%;">{{venue.name}}</td>
+                            <!--<td style="width: 18%;">{{venue.price_range}}</td>-->
+                            <td style="width: 15%;">{{venue.review_count}}</td>
+                            <td style="width: 12%;">{{venue.stars}}</td>
+                            <td style="width: 27%;">{{venue.type}}</td>
+                            <!--<td style="width: 27%;">{{venue.selection_flag}}</td>-->
+                        </tr>
+                        </tbody>
+                    </table>
+                    <ul class="pagination pagination-sm" v-for="pagination in pagination_arr"
+                        style="margin-top: 8px; margin-bottom: 5px">
+                        <li v-bind:class="{active: pagination.isActive, disabled: pagination.isDisabled}"
+                            v-on:click="clickPagination(pagination)">
+                            <a>{{pagination.pg}}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div v-else>
+                    No data is loaded.
+                </div>
+            </section>
+        </div>
+        <div class="sidebar main-column" style="float: left; width: 41%;">
+            <div id="mapViewRealMap" class="singleViewBorder">
+                <!--<h3 style="background-color: #aaaaaa; margin-top: 1px; margin-bottom: 0px">Map View</h3>-->
+                <!--<section id="mapViewRealMap" class="singleViewBorder">-->
+                <!--</section>-->
+            </div>
+            <div id="temporalView" class="singleViewBorder" style="margin-right: 0px">
+                <!--<h3 style="background-color: #aaaaaa; margin-top: 1px; margin-bottom: 0px">Temporal View</h3>-->
+            </div>
+
+        </div>
+        <div class="sidebar main-column" style="float: left; width: 40%;">
+            <div id="commonCustomerComparisonView" class="singleViewBorder">
+                <!--<h3 style="background-color: #aaaaaa; margin-top: 1px; margin-bottom: 0px">Common Customer Comparison-->
+                <!--View</h3>-->
+                <!--<section >-->
+                <!--</section>-->
+            </div>
+            <div style="width: 100%">
+                <div id="wordCloudView" style="width: 758px; height: 400px; margin-bottom: 5px;"
+                class="singleViewBorder">
+                </div>
+                <!--<div id="wordCloudView" style="width: 1600px; height: 800px; margin-bottom: 5px;"-->
+                     <!--class="singleViewBorder">-->
+                <!--</div>-->
+                <div id="detailedReviewContentView"
+                     style="width: 758px; height: 200px; margin-bottom: 5px; overflow-y: scroll;"
+                     class="singleViewBorder">
+                    <div v-if="curent_review_content != '' " class="review_content">
+                        <div>
+                            <div style="width: 48%; display: inline-block;"><span class="review_attr_name">Business Name: </span>
+                                <span>{{curent_review_content.business_name}}</span>
+                            </div>
+                            <div style="width: 48%; display: inline-block;"><span class="review_attr_name">Customer Name: </span>
+                                <span>{{curent_review_content.user_name}}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="width: 48%; display: inline-block;"><span
+                                    class="review_attr_name">Review Date: </span>
+                                <span>{{curent_review_content.date}}</span></div>
+                            <div style="width: 48%; display: inline-block;"><span
+                                    class="review_attr_name">Rating: </span>
+                                <span>{{curent_review_content.stars}}</span>
+                            </div>
+                        </div>
+
+                        <div><span class="review_attr_name">User Votes: </span>
+                            <span>{{curent_review_content.funny + curent_review_content.useful + curent_review_content.cool}}</span>
+                        </div>
+                        <div><span class="review_attr_name">Review Text: </span>
+                            <span>{{curent_review_content.text}}</span></div>
+
+                        <!--<div><span class="review_attr_name">Business Name: </span> <span>{{curent_review_content.business_name}}</span>-->
+                        <!--</div>-->
+                        <!--<div><span class="review_attr_name">Customer Name: </span> <span>{{curent_review_content.user_name}}</span>-->
+                        <!--</div>-->
+                        <!--<div><span class="review_attr_name">Review Date: </span>-->
+                        <!--<span>{{curent_review_content.date}}</span></div>-->
+                        <!--<div><span class="review_attr_name">Rating: </span> <span>{{curent_review_content.stars}}</span>-->
+                        <!--</div>-->
+                        <!--<div><span class="review_attr_name">Review Text: </span>-->
+                        <!--<span>{{curent_review_content.text}}</span></div>-->
+                    </div>
+                    <div v-else>
+                        No Review is Selected.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://d3js.org/d3.v3.js"></script>
+<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="js/vue2.js"></script>
+<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+<script src="js/lib/d3.layout.cloud.js"></script>
+
+<!--<script src="js/lib/vuejs-slider.min.js"></script>-->
+
+<script src="js/marked.min.js"></script>
+<script src="js/lib/NodeLink.js"></script>
+<script src="js/lib/venueGlyph.js"></script>
+<script src="js/lib/sankey.js"></script>
+<script src="js/lib/drawWordCloud.js"></script>
+
+<script src="js/service/pipService.js"></script>
+<script src="js/service/dataService.js"></script>
+
+<!--<script src="js/vue-model/graphView.js"></script>-->
+
+<script src="js/vue-model/mapView.js"></script>
+<script src="js/vue-model/control-view.js"></script>
+
+
+<script src="js/vue-model/commonCustomerView.js"></script>
+<script src="js/vue-model/temporalView.js"></script>
+<script src="js/vue-model/augmentedWordCloudView.js"></script>
+<script src="js/vue-model/detailedReviewContentView.js"></script>
+
+
+</body>
+</html>
+

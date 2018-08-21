@@ -1,0 +1,11 @@
+source,target,value
+L3hh,M1hh,2
+L3hh,M0hh,3
+L2hh,M1hh,1
+L1hh,M0hh,4
+L1hh,M-1hh,3
+M1hh,R2hh,2
+M1hh,R1hh,1
+M0hh,R3hh,3
+M0hh,R1hh,4
+M-1hh,R2hh,3

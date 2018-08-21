@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<style>
+    circle {
+        fill: lightgreen;
+        stroke: #000;
+    }
+</style>
+<body>
+<script src="http://d3js.org/d3.v2.min.js"></script>
+<script>
+    var svg = d3.select("body").append("svg")
+            .style("float", "left")
+            .attr("width", 480)
+            .attr("height", 480)
+            .on("mousedown", log("mousedown svg"))
+            .on('mousemove', function () {
+                console.log('hello, mousemove!');
+                d3.event.preventDefault();
+            })
+            .on("mouseup", log("mouseup svg"))
+            .on("click", log("click svg"));
+
+    svg.append("circle")
+            .attr("cx", 240)
+            .attr("cy", 240)
+            .attr("r", 200)
+            .on("mousedown", function () {
+                d3.event.stopPropagation();
+            })
+            .on("mousedown.log", log("mousedown circle"))
+            .on("mouseup", log("mouseup circle"))
+            .on("click", log("click circle"))
+
+    var div = d3.select("body").append("div")
+            .style("float", "left")
+
+    function log(message) {
+        return function () {
+            div.append("p")
+                    .text(message)
+                    .style("background", "#ff0")
+                    .transition()
+                    .duration(2500)
+                    .style("opacity", 1e-6)
+                    .remove();
+        };
+    }
+</script>
